@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"  media="all" th:href="@{/css/productform.css}"/>
+    <title>Productform</title>
+</head>
+<body>
+
+<section layout:fragment="content">
+    <p style="text-align:center">Categoryform </p>
+    <div class="container mt-4">
+        <div th:if="${nameError}" class="alert alert-danger" th:text="${nameError}"></div>
+        <div th:if="${descriptionError}" class="alert alert-danger" th:text="${descriptionError}"></div>
+        <form method="post" th:action="@{/products/categoryform}" th:object="${category}">
+            <div class="form-group">
+                <label for="name">Title</label>
+                <input th:field="${category.name}" type="text" class="form-control" id="name"  placeholder="Enter title">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input th:field="${category.description}" type="text" class="form-control" id="description" placeholder="Enter description">
+            </div>
+            <button aria-describedby="button-submit" type="submit" class="btn btn-primary">Submit</button>
+            <p id="button-submit"  class="form-text text-muted">
+                Click send if you filled the form!
+            </p>
+        </form>
+    </div>
+</section>
+</body>
+</html>

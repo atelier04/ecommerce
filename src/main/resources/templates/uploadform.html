@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>UpdateForm</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"  media="all" th:href="@{/css/productform.css}"/>
+</head>
+<body>
+<section class="mt-4" layout:fragment="content">
+    <p style="text-align:center">Update Form </p>
+    <div class="container mt-4">
+        <form method="post" th:action="@{/products/uploadform}" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="file">Upload File</label>
+                <input  type="file" class="form-control" id="file">
+            </div>
+            <button aria-describedby="button-submit" type="submit" class="btn btn-primary">Submit</button>
+            <p id="button-submit"  class="form-text text-muted">
+                Click send if you filled the form!
+            </p>
+        </form>
+    </div>
+</section>
+
+</body>
+</html>

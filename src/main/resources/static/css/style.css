@@ -1,0 +1,16 @@
+body
+{
+margin-auto:0;
+font-family: Arial, Helvetica, sans-serif;
+font-size:20px !important;
+
+}
+*{
+box-sizing: border-box;
+}
+.nav-link{
+  color:white !important;
+}
+button{
+color:white;
+}

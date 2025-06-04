@@ -15,11 +15,13 @@ public class Product {
     Integer productId;
     @Column(name="brand",unique = false, nullable = true,length = 20)
     String brand;
-    @Column(name="title",unique = true, nullable = false,length = 20)
+    @Column(name="title",unique = false, nullable = false,length = 20)
     String title;
     @Column(name="description", unique = false, nullable = false, length=100)
     String description;
     @ManyToOne
     @JoinColumn(name="categoryId")
     Category category;
+
+
 }
