@@ -194,7 +194,7 @@ public class ProductController {
     }
 
     @PostMapping("/update/{productId}")
-    public String update(@PathVariable Integer productId, @RequestPart("file") MultipartFile multipartFile, @Valid @ModelAttribute Product productRequest,
+    public String update(@PathVariable Integer productId, @RequestPart("file") MultipartFile multipartFile, @Valid @ModelAttribute ProductRequest productRequest,
                          BindingResult result, RedirectAttributes redirectAttributes)
     //public ResponseEntity<Product> update(@PathVariable Integer productId, @RequestBody ProductRequest productRequest)
     {
@@ -222,11 +222,11 @@ public class ProductController {
         }
         try{
             System.out.println("multipartFile.getOriginalFilename()() " + multipartFile.getOriginalFilename());
-
+            Category category=categoryService.findByCategoryId(productRequest.getCategoryId());
             Product product = Product.builder().brand(productRequest.getBrand()).title(productRequest.getTitle())
                         .description(productRequest.getDescription()).productId(productId).
                          data(multipartFile.getBytes()).
-                        category(productRequest.getCategory()).build();
+                        category(category).build();
                 //  return ResponseEntity.ok(productService.update(productId,product));
                 productService.update(productId,product);
                 redirectAttributes.addFlashAttribute("updateSuccess","Product was updated");
@@ -235,7 +235,7 @@ public class ProductController {
         catch(BadRequestException badRequestException)
         {
             System.out.println(badRequestException.getMessage());
-            redirectAttributes.addFlashAttribute("updateFailure","Product was not updated!!");
+            redirectAttributes.addFlashAttribute("updateFailure","Product was not updated!!"+badRequestException.getMessage());
             return "redirect:/products/";
         } catch (IOException e) {
             System.out.println(e.getMessage());
