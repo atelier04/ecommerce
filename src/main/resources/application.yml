@@ -18,5 +18,17 @@ spring:
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  cache:
+    cache-names:
+      - products
 server:
   port: 8082
+
+
+
+
+

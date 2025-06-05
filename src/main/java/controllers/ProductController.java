@@ -6,15 +6,21 @@ import entities.Category;
 import entities.Product;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import services.CategoryService;
 import services.ProductService;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 @Controller
@@ -28,10 +34,30 @@ public class ProductController {
     }
     @GetMapping("/")
     //public ResponseEntity<List<Product>> findProducts(Model model)
+    //@CachePut(value={"products"},key="#product.productId")
     public String findProducts(Model model)
     {
-        model.addAttribute("products",productService.findAll());
+        List<Product> products= productService.findAll();
+        String cwd = System.getProperty("user.dir");
+        System.out.println(cwd);
+        File f=new File(cwd+File.separator+"src"+File.separator+"main"+File.separator+"resources"+File.separator+"static"+File.separator+"downloads");
+
+        if(!f.exists()){
+            System.out.println(f.mkdir());
+        }
+        products.stream().forEach((p)->{
+            try(FileOutputStream outputStream =new FileOutputStream(f.getAbsolutePath()+File.separator+p.getProductId()+".png"))
+            {
+                 outputStream.write(p.getData());
+                 outputStream.flush();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        });
+
+        model.addAttribute("products",products);
         model.addAttribute("productHeader","products");
+        model.addAttribute("absolutePath",f.getAbsolutePath()+File.separator);
         //return ResponseEntity.ok().body(productService.findAll());
 
         return "products";
@@ -141,9 +167,17 @@ public class ProductController {
     }
     @GetMapping("/update/{productId}")
     public String updateForm(@PathVariable Integer productId, Model model) throws BadRequestException {
+        //ProductRequest.builder() not here from Lombok but I can do Product.builder()
+
         Product product =productService.findById(productId);
         List<Category> categories=categoryService.findAll();
+        ProductRequest productRequest=ProductRequest.builder().
+
+                brand(product.getBrand()).title(product.getTitle())
+                        .description(product.getDescription()).categoryId(product.getCategory().getCategoryId()).
+                build();
         model.addAttribute("product",product);
+        model.addAttribute("productRequest",productRequest);
         model.addAttribute("categories",categories);
         return "updateform";
 
@@ -159,36 +193,54 @@ public class ProductController {
         return "redirect:/products/";
     }
 
-
-
     @PostMapping("/update/{productId}")
-    public String update(@PathVariable Integer productId, @ModelAttribute Product productRequest,RedirectAttributes redirectAttributes)
+    public String update(@PathVariable Integer productId, @RequestPart("file") MultipartFile multipartFile, @Valid @ModelAttribute Product productRequest,
+                         BindingResult result, RedirectAttributes redirectAttributes)
     //public ResponseEntity<Product> update(@PathVariable Integer productId, @RequestBody ProductRequest productRequest)
     {
-        if(!productRequest.getTitle().isEmpty() && !productRequest.getBrand().isEmpty() && !productRequest.getDescription().isEmpty()
-
-        )
+        System.out.println("multipartFile.getOriginalFilename() "+multipartFile.getOriginalFilename());
+        if(result.hasErrors() || result.hasFieldErrors())
         {
-            try
-            {
-                Product product = Product.builder().brand(productRequest.getBrand()).title(productRequest.getTitle())
+            System.out.println("result.hasErrors() "+result.hasErrors());
+            System.out.println("result.getFieldErrors() "+result.getFieldErrors());
+            result.getFieldErrors().stream().
+                    forEach(fe->{
+                        if(fe.getField().contains("title")){
+                            System.out.println("titleError");
+                            redirectAttributes.addFlashAttribute("titleError",fe.getDefaultMessage());
+                        }
+                        if(fe.getField().contains("brand")){
+                            System.out.println("brandError");
+                            redirectAttributes.addFlashAttribute("brandError",fe.getDefaultMessage());
+                        }
+                        if(fe.getField().contains("description")){
+                            System.out.println("descriptionError");
+                            redirectAttributes.addFlashAttribute("descriptionError",fe.getDefaultMessage());
+                        }
+                    });
+            return "redirect:/products/";
+        }
+        try{
+            System.out.println("multipartFile.getOriginalFilename()() " + multipartFile.getOriginalFilename());
+
+            Product product = Product.builder().brand(productRequest.getBrand()).title(productRequest.getTitle())
                         .description(productRequest.getDescription()).productId(productId).
+                         data(multipartFile.getBytes()).
                         category(productRequest.getCategory()).build();
                 //  return ResponseEntity.ok(productService.update(productId,product));
-
                 productService.update(productId,product);
                 redirectAttributes.addFlashAttribute("updateSuccess","Product was updated");
+             return "redirect:/products/";
             }
-            catch(BadRequestException badRequestException)
-            {
-                System.out.println(badRequestException.getMessage());
-                redirectAttributes.addFlashAttribute("updateFailure","Product was not updated!!");
-                // return  ResponseEntity.badRequest().body(null);
-            }
+        catch(BadRequestException badRequestException)
+        {
+            System.out.println(badRequestException.getMessage());
+            redirectAttributes.addFlashAttribute("updateFailure","Product was not updated!!");
+            return "redirect:/products/";
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            redirectAttributes.addFlashAttribute("updateFailure","Product was not updated!! IOEXception "+e.getMessage());
+            return "redirect:/products/";
         }
-        redirectAttributes.addFlashAttribute("fieldsEmpty","You didn't fill out all fields!! " +
-                "Product was not updated!!");
-        return "redirect:/products/";
-
     }
 }

@@ -13,18 +13,22 @@
 <section layout:fragment="content">
 
     <div class="container mt-4">
-        <form method="post" th:action="@{'/products/update/'+${product.productId}}" th:object="${product}">
+        <form method="post" enctype="multipart/form-data" th:action="@{'/products/update/'+${product.productId}}" th:object="${productRequest}">
             <div class="form-group">
                 <label for="title">Title</label>
-                <input th:field="${product.title}" type="text" class="form-control" id="title"  placeholder="Enter title">
+                <input th:field="${productRequest.title}" type="text" class="form-control" id="title"  placeholder="Enter title">
             </div>
             <div class="form-group">
                 <label for="brand">Brand</label>
-                <input th:field="${product.brand}"  type="text" class="form-control" id="brand" placeholder="Enter brand">
+                <input th:field="${productRequest.brand}"  type="text" class="form-control" id="brand" placeholder="Enter brand">
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
-                <input th:field="${product.description}" type="text" class="form-control" id="description" placeholder="Enter description">
+                <input th:field="${productRequest.description}" type="text" class="form-control" id="description" placeholder="Enter description">
+            </div>
+            <div class="form-group">
+                <label for="file">Upload File</label>
+                <input th:field="${productRequest.file}"  name="data" type="file" class="form-control" id="file">
             </div>
             <div class="form-group">
                 <label for="categories">Choose an option</label>

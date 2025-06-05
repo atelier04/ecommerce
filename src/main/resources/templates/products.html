@@ -19,7 +19,9 @@
     <div th:if="${failureMessage}" class="alert alert-danger" th:text="${failureMessage}"></div>
     <div th:if="${updateSuccess}" class="alert alert-success" th:text="${updateSuccess}"></div>
     <div th:if="${updateFailure}" class="alert alert-danger" th:text="${updateFailure}"></div>
-    <div th:if="${fieldsEmpty}" class="alert alert-danger" th:text="${fieldsEmpty}"></div>
+    <div th:if="${titleError}" class="alert alert-danger" th:text="${titleError}"></div>
+    <div th:if="${descriptionError}" class="alert alert-danger" th:text="${descriptionError}"></div>
+    <div th:if="${brandError}" class="alert alert-danger" th:text="${brandError}"></div>
     <p class="text-center fs-1 fs-md-3 fs-lg-5" th:text="${productHeader}">Text</p>
     <div class="table-responsive rounded">
         <table class="table table-striped table-dark table-bordered mb-0">
@@ -27,6 +29,7 @@
             <th>Brand</th>
             <th>Title</th>
             <th>Description</th>
+            <th>Image</th>
             <th>Category</th>
             <th>Update</th>
             <th>Delete</th>
@@ -35,6 +38,7 @@
               <td th:text="${product.brand}"></td>
               <td th:text="${product.title}"></td>
               <td th:text="${product.description}"></td>
+              <td ><img height="70" width="70" alt="no image file" th:src="@{'/downloads/'+${product.productId}+'.png'+ '?v=' + ${#dates.createNow().time}}"/></td>
               <td th:text="${product.category}"></td>
               <td ><button class="bg-primary rounded" type="submit"><a  th:href="@{'/products/update/'+${product.productId}}">Update</a></button></td>
               <td ><button class="bg-danger rounded" type="submit"><a  th:href="@{'/products/delete/'+${product.productId}}">Delete</a></button></td>

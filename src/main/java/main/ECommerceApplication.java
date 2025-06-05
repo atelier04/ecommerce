@@ -1,8 +1,9 @@
 package main;
-import configurations.DataSourceConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,7 +14,8 @@ import services.MyService;
 @SpringBootApplication()
 @EntityScan(basePackages = {"entities"})
 @EnableJpaRepositories(basePackages = {"repositories"})
-@ComponentScan(basePackages = {"controllers","services"})
+@ComponentScan(basePackages = {"controllers","services","configurations"})
+//@CacheConfig(cacheNames={"products"})
 public class ECommerceApplication {
     public static void main(String[] args) {
        ConfigurableApplicationContext context=SpringApplication.run(ECommerceApplication.class, args);
@@ -21,6 +23,7 @@ public class ECommerceApplication {
        MyService myService2= (MyService) context.getBean(IMyService.class);
        myService2.consume();
        // DataSource ds=context.getBean(DataSource.class);
+
     }
 
     @Bean(name="blabla")
